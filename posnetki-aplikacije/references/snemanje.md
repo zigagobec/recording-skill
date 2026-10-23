@@ -15,7 +15,9 @@
 
 **Windows 11:**
 - *Orodje za izrezovanje* (Snipping Tool): Win+Shift+R → izbere območje (okno brskalnika)
-  → Začni. Ustavi z rdečim gumbom; posnetek odpre se v orodju → Shrani kot → `posnetki/`.
+  → Začni. Ustavi z rdečim gumbom. Novejše verzije posnetek samodejno shranijo v
+  `Videoposnetki\Posnetki zaslona` (Videos\Screen Recordings), starejše ga odprejo v orodju
+  → Shrani kot. V obeh primerih ga premakne v `posnetki/`.
 - Ali *Xbox Game Bar*: Win+Alt+R začne/ustavi snemanje aktivnega okna. Posnetki gredo v
   `Videoposnetki\Posnetki` (Videos\Captures); premakni ga v `posnetki/`.
 
@@ -28,7 +30,10 @@ Zvoka med snemanjem ne rabimo (glas dodamo kasneje), zato mikrofon lahko ostane 
 
 1. Odpri aplikacijo v novem zavihku (`tabs_create_mcp`, `navigate`) in preveri, da vidiš
    pravo stran in da je prijavljena (če ni, naj se prijavi sama; gesel ne vpisuj ti).
-2. Reci ji: »Zaženi snemanje okna brskalnika in mi napiši *začni*.«
+2. Reci ji: »Kazalec miške umakni iz okna brskalnika, zaženi snemanje okna in mi napiši
+   *začni*.« Tvoji kliki pravega kazalca ne premikajo; kazalec, ki obvisi sredi okna, bi
+   gledalca zmedel. Ker se kazalec ne vidi, vsak klik pri montaži označi z `zoom` ali
+   `caption`.
 3. Počakaj ~2 s, nato izvajaj korake scenarija. Po vsakem koraku počakaj, da se stran
    naloži, in še ~1,5 s, da gledalec vidi rezultat. Vnašaj besedilo z realnimi, izmišljenimi
    podatki (»Testni dobavitelj d.o.o.«, ne »asdf«).
@@ -50,7 +55,8 @@ Daj ji oštevilčen seznam kratkih navodil (»3. Klikni *Nov* zgoraj desno«). P
 ## Način C: kratek GIF (brez glasu)
 
 Za 5–20 s animacijo (npr. v e-pošto ali Confluence) uporabi `gif_creator` iz Claude in Chrome:
-začni snemanje, naredi korake, ustavi in izvozi. Dobljeni GIF lahko tudi uporabiš kot `clip`
+začni snemanje, naredi korake, ustavi in izvozi. GIF pristane v brskalnikovi mapi Prenosi;
+prosi jo, naj ga premakne v `posnetki/`. Dobljeni GIF lahko tudi uporabiš kot `clip`
 v planu ali ga s `render.py` spremeniš v MP4 z napisi.
 
 ## Posnetki zaslona namesto videa

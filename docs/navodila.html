@@ -117,7 +117,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line
   <section>
     <h2>Kaj potrebuješ</h2>
     <ul class="plain">
-      <li><strong>Claude aplikacijo za računalnik</strong> (Windows ali Mac) s plačljivim paketom, ker montaža teče v načinu <strong>Cowork</strong>. V spletnem klepetu na claude.ai ne gre.</li>
+      <li><strong>Claude aplikacijo za računalnik</strong> (Windows ali Mac) s plačljivim paketom. Delaš v načinu <strong>Cowork</strong>, ker ima dostop do mape na tvojem računalniku, kjer so posnetki.</li>
       <li><strong>Razširitev Claude in Chrome</strong> v brskalniku Chrome. Ni nujna, je pa priročna: z njo Claude sam klika po aplikaciji, medtem ko ti snemaš.</li>
       <li><strong>Datoteko skilla</strong> <code>posnetki-aplikacije.zip</code> (link spodaj).</li>
       <li>Za umetni glas še <strong>ključ OpenAI</strong>, ki ti ga pošljem posebej. Brez njega lahko besedilo prebereš sama ali video narediš brez glasu.</li>
@@ -133,7 +133,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line
       </div></li>
       <li><div>
         <h3>Naloži ga v Claude</h3>
-        <p>V Claude aplikaciji odpri <strong>Nastavitve</strong> → <strong>Capabilities</strong> (Zmožnosti) → razdelek <strong>Skills</strong> → <strong>Upload skill</strong> in izberi zip. V novejših verzijah je to pod <strong>Customize → Skills</strong>.</p>
+        <p>V Claude aplikaciji odpri <strong>Nastavitve</strong> → <strong>Capabilities</strong> (Zmožnosti) → razdelek <strong>Skills</strong> → <strong>Upload skill</strong> in izberi zip. V novejših verzijah je to lahko pod <strong>Customize → Skills</strong>; imena menijev se med verzijami malo spreminjajo, išči besedo <em>Skills</em>.</p>
         <p class="hint">Na isti strani mora biti vklopljeno <em>Code execution and file creation</em>. Po nalaganju skill <code>posnetki-aplikacije</code> pusti vklopljen.</p>
       </div></li>
       <li><div>
@@ -142,7 +142,8 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line
       </div></li>
       <li><div>
         <h3>Dodaj ključ za glas</h3>
-        <p>V mapo <code>Videi</code> shrani datoteko z imenom <code>.env</code> (s piko spredaj, brez končnice) in vanjo eno vrstico: <code>OPENAI_API_KEY=</code> in za enačajem ključ, ki ti ga pošljem. Ključa ne prilepi v klepet. Če ti ustvarjanje datoteke dela težave, prosi Clauda, naj ti jo naredi.</p>
+        <p>Poslal ti bom pripravljeno datoteko <code>.env</code>. Shrani jo v mapo <code>Videi</code>, ime naj ostane točno <code>.env</code> (s piko spredaj, brez končnice). Ključa ne prilepi v klepet s Claudom.</p>
+        <p class="hint">Če jo delaš sama: Beležnica, ena vrstica <code>OPENAI_API_KEY=</code> in za enačajem ključ, nato Datoteka → Shrani kot → <em>Vrsta datoteke: Vse datoteke</em> → ime <code>.env</code>. Brez tega koraka nastane <code>.env.txt</code>, ki ne deluje.</p>
       </div></li>
       <li><div>
         <h3>Dovoli dostop do interneta (če Claude javi napako)</h3>
@@ -171,7 +172,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line
         <thead><tr><th>Kaj</th><th>Windows</th><th>Mac</th></tr></thead>
         <tbody>
           <tr><td>Začni snemanje dela zaslona</td><td><kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>, izberi okno brskalnika, <em>Začni</em></td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>5</kbd>, <em>Posnemi izbrani del</em></td></tr>
-          <tr><td>Ustavi</td><td>rdeči gumb v orodni vrstici, nato <em>Shrani kot</em></td><td>gumb v menijski vrstici zgoraj</td></tr>
+          <tr><td>Ustavi</td><td>rdeči gumb v orodni vrstici; posnetek se shrani v <em>Videoposnetki › Posnetki zaslona</em> (ali ponudi <em>Shrani kot</em>)</td><td>gumb v menijski vrstici zgoraj; posnetek je na namizju</td></tr>
           <tr><td>Posnetek zaslona (slika)</td><td><kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>4</kbd></td></tr>
         </tbody>
       </table>
@@ -179,15 +180,15 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line
     <div class="cols">
       <div class="opt rec-top">
         <h3>Claude klika, ti snemaš</h3>
-        <p class="hint">Če imaš Claude in Chrome. Zaženeš snemanje, napišeš »začni« in miško pustiš pri miru. Premore med koraki Claude pri montaži izreže.</p>
+        <p class="hint">Če imaš Claude in Chrome. Kazalec miške umakneš iz okna, zaženeš snemanje in napišeš »začni«. Kazalec se v posnetku ne premika, zato Claude klike pokaže s približanjem in napisi. Premore med koraki izreže.</p>
       </div>
       <div class="opt">
         <h3>Ti klikaš po seznamu</h3>
-        <p class="hint">Claude ti da oštevilčene korake. Delaj malo počasneje kot sicer. Ob napaki ne ustavljaj, samo ponovi korak.</p>
+        <p class="hint">Claude ti da oštevilčene korake. Delaj malo počasneje kot sicer. Ob napaki ne ustavljaj, samo ponovi korak. Najbolj naraven rezultat, ker se vidi, kam klikneš.</p>
       </div>
       <div class="opt">
         <h3>Kratek GIF</h3>
-        <p class="hint">Za 5–20 sekund brez glasu, npr. v e-pošto ali Confluence. Claude ga posname sam prek Claude in Chrome.</p>
+        <p class="hint">Za 5–20 sekund brez glasu, npr. v e-pošto ali Confluence. Claude ga posname sam prek Claude in Chrome; GIF se shrani v Prenose, od tam ga premakneš v mapo <code>posnetki</code>.</p>
       </div>
     </div>
     <p class="hint">Pred snemanjem: zapri druge zavihke, vklopi »Ne moti« (<kbd>Win</kbd> + <kbd>N</kbd>), brskalnik razširi čez cel zaslon. Posnetek shrani v mapo <code>posnetki</code>, ki jo naredi Claude.</p>

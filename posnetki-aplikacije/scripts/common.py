@@ -11,8 +11,9 @@ SKILL_DIR = Path(__file__).resolve().parent.parent
 FONT_REGULAR = SKILL_DIR / "assets" / "fonts" / "NotoSans-Regular.ttf"
 FONT_BOLD = SKILL_DIR / "assets" / "fonts" / "NotoSans-SemiBold.ttf"
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 def ffmpeg_bin() -> str:
@@ -59,12 +60,27 @@ def probe(path) -> dict:
     return info
 
 
+def duration_of(path) -> float:
+    """Duration in seconds. Files from live recorders (WebM/MKV) often have no Duration in
+    the header, so fall back to decoding the file once and reading the last time= stamp."""
+    d = probe(path)["duration"]
+    if d:
+        return d
+    res = subprocess.run([ffmpeg_bin(), "-hide_banner", "-i", str(path), "-f", "null", "-"],
+                         capture_output=True, text=True, errors="replace")
+    stamps = re.findall(r"time=(\d+):(\d+):([\d.]+)", res.stderr)
+    if not stamps:
+        sys.exit(f"Ne morem ugotoviti dolžine datoteke {path} (je posnetek poškodovan?).")
+    h, m, s = stamps[-1]
+    return int(h) * 3600 + int(m) * 60 + float(s)
+
+
 def load_env(start: Path) -> None:
     """Load KEY=VALUE lines from the nearest .env (start dir and its parents) into os.environ."""
     for d in [start, *start.parents]:
         f = d / ".env"
         if f.is_file():
-            for line in f.read_text(encoding="utf-8").splitlines():
+            for line in f.read_text(encoding="utf-8-sig").splitlines():  # Notepad adds a BOM
                 line = line.strip()
                 if line and not line.startswith("#") and "=" in line:
                     k, v = line.split("=", 1)

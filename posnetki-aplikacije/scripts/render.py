@@ -15,7 +15,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from common import FONT_BOLD, FONT_REGULAR, ffmpeg_bin, load_env, probe, read_json, run
+from common import FONT_BOLD, FONT_REGULAR, duration_of, ffmpeg_bin, load_env, probe, read_json, run
 from tts import synth
 
 LEAD = 0.25    # silence before the voice starts in a segment
@@ -73,15 +73,18 @@ def title_png(text, subtitle, size, theme, path):
     f2 = ImageFont.truetype(str(FONT_REGULAR), round(H * 0.04))
     lines = wrap(d, text, f1, W * 0.8)
     lh = round(f1.size * 1.2)
-    block = lh * len(lines) + (round(H * 0.08) if subtitle else 0)
+    sub_lines = len(wrap(d, subtitle, f2, W * 0.8)) if subtitle else 0
+    block = lh * len(lines) + (round(H * 0.025 + sub_lines * f2.size * 1.3) if subtitle else 0)
     y = (H - block) / 2
     d.rectangle([W * 0.1, y - H * 0.05, W * 0.1 + H * 0.08, y - H * 0.05 + 8],
                 fill=hex_rgb(theme["accent"])[:3])
     for l in lines:
         d.text((W * 0.1, y), l, font=f1, fill=(255, 255, 255))
         y += lh
-    if subtitle:
-        d.text((W * 0.1, y + H * 0.025), subtitle, font=f2, fill=(170, 178, 195))
+    y += H * 0.025
+    for l in wrap(d, subtitle, f2, W * 0.8) if subtitle else []:
+        d.text((W * 0.1, y), l, font=f2, fill=(170, 178, 195))
+        y += round(f2.size * 1.3)
     img.save(path)
 
 
@@ -91,14 +94,16 @@ def voice_for(seg, i, plan, base, work):
     """Return (audio_path, duration, text) for a segment's voiceover, or (None, 0, None)."""
     if seg.get("voice_file"):
         p = base / seg["voice_file"]
-        return p, probe(p)["duration"], seg.get("voiceover")
+        if not p.is_file():
+            sys.exit(f"Segment {i}: datoteke {seg['voice_file']} ni.")
+        return p, duration_of(p), seg.get("voiceover")
     text = (seg.get("voiceover") or "").strip()
     if not text:
         return None, 0.0, None
     if not plan.get("voice"):
         sys.exit(f"Segment {i} ima voiceover, plan pa nima nastavitve 'voice'.")
     out = synth(text, work / f"vo_{i:02d}.mp3", plan["voice"], base / ".tts_cache")
-    return out, probe(out)["duration"], text
+    return out, duration_of(out), text
 
 
 def zoom_filter(z, size, fps):
@@ -115,7 +120,20 @@ def zoom_filter(z, size, fps):
     # upscale first: zoompan rounds x/y to whole pixels, which jitters at 1x
     return (f"scale={W * 2}:{H * 2}:force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,"
             f"pad={W * 2}:{H * 2}:(ow-iw)/2:(oh-ih)/2:color=black,"
-            f"zoompan=z='{zoom}':x='{x}':y='{y}':d=1:s={W}x{H}:fps={fps}")
+            f"zoompan=z='{zoom}':x='{x}':y='{y}':d=1:s={W}x{H}:fps={fps},setsar=1")
+
+
+def atempo_chain(speed):
+    """atempo only accepts 0.5–2.0 per stage, so chain stages for larger changes."""
+    stages = []
+    while speed > 2.0:
+        stages.append(2.0)
+        speed /= 2.0
+    while speed < 0.5:
+        stages.append(0.5)
+        speed /= 0.5
+    stages.append(speed)
+    return ",".join(f"atempo={s:.4f}" for s in stages)
 
 
 def blur_chain(boxes, label_in):
@@ -147,15 +165,23 @@ def render_segment(i, seg, plan, base, work, size, fps, enc):
                   f"fade=out:st={T - 0.4:.3f}:d=0.4[v]")
     else:
         src = base / seg["source"]
+        if not src.is_file():
+            sys.exit(f"Segment {i}: datoteke {seg['source']} ni.")
         if kind == "image":
             T = max(seg.get("duration", 4.0), T_voice)
             inputs += ["-loop", "1", "-t", f"{T:.3f}", "-i", str(src)]
             speed, hold = 1.0, 0.0
             chain = "[0:v]setpts=PTS-STARTPTS"
         else:
-            info = probe(src)
+            src_dur = duration_of(src)
             start = float(seg.get("start", 0))
-            end = float(seg.get("end", info["duration"]))
+            end = float(seg.get("end", src_dur))
+            if not 0 <= start < src_dur - 0.05:
+                sys.exit(f"Segment {i}: start {start} s je izven posnetka {seg['source']} "
+                         f"(traja {src_dur:.2f} s).")
+            if end <= start + 0.05:
+                sys.exit(f"Segment {i}: end ({end} s) mora biti večji od start ({start} s).")
+            end = min(end, src_dur)
             V = end - start
             speed = float(seg.get("speed", 1.0))
             fit = seg.get("fit", "auto")
@@ -178,7 +204,7 @@ def render_segment(i, seg, plan, base, work, size, fps, enc):
             fc.append(f"[{cur}]{zoom_filter(seg['zoom'], size, fps)}[zm]")
         else:
             fc.append(f"[{cur}]scale={W}:{H}:force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,"
-                      f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color={theme['background']}[zm]")
+                      f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color={theme['background']},setsar=1[zm]")
         cur = "zm"
         if hold > 0.05:
             fc.append(f"[{cur}]tpad=stop_mode=clone:stop_duration={hold:.3f}[hd]")
@@ -200,9 +226,7 @@ def render_segment(i, seg, plan, base, work, size, fps, enc):
         fc.append(f"[{n}:a]loudnorm=I=-16:TP=-1.5,aresample={AR},aformat=channel_layouts=stereo,"
                   f"adelay={int(LEAD * 1000)}:all=1,apad,atrim=duration={T:.3f}[a]")
     elif kind == "clip" and seg.get("keep_audio") and probe(base / seg["source"])["has_audio"]:
-        tempo = ",".join(["atempo=2.0"] * int(speed // 2) + [f"atempo={speed / 2 ** int(speed // 2):.4f}"]) \
-            if speed > 2 else f"atempo={speed:.4f}"
-        fc.append(f"[0:a]{tempo},aresample={AR},aformat=channel_layouts=stereo,"
+        fc.append(f"[0:a]{atempo_chain(speed)},aresample={AR},aformat=channel_layouts=stereo,"
                   f"apad,atrim=duration={T:.3f}[a]")
     else:
         inputs += ["-f", "lavfi", "-t", f"{T:.3f}", "-i", f"anullsrc=r={AR}:cl=stereo"]
@@ -211,7 +235,7 @@ def render_segment(i, seg, plan, base, work, size, fps, enc):
 
     run([ffmpeg_bin(), "-y", "-v", "error", *inputs, "-filter_complex", ";".join(fc),
          "-map", "[v]", "-map", "[a]", *enc, "-t", f"{T:.3f}", str(out)])
-    real = probe(out)["duration"]
+    real = duration_of(out)
     return out, real, (LEAD, A, vo_text) if vo_path else None, note
 
 
@@ -273,6 +297,8 @@ def main():
     work.mkdir(exist_ok=True)
 
     segs = plan["segments"]
+    if a.only and not 1 <= a.only <= len(segs):
+        sys.exit(f"--only {a.only}: plan ima segmente 1–{len(segs)}.")
     todo = [a.only] if a.only else range(1, len(segs) + 1)
     rendered, cues, clock = [], [], 0.0
     for i in todo:
@@ -287,10 +313,8 @@ def main():
         clock += dur
 
     out = base / plan.get("output", "izvoz/video.mp4")
-    if a.only:
-        out = out.with_name(f"{out.stem}_seg{a.only:02d}{out.suffix}")
-    elif a.draft:
-        out = out.with_name(f"{out.stem}_osnutek{out.suffix}")
+    suffix = (f"_seg{a.only:02d}" if a.only else "") + ("_osnutek" if a.draft else "")
+    out = out.with_name(f"{out.stem}{suffix}{out.suffix}")
     out.parent.mkdir(parents=True, exist_ok=True)
 
     lst = work / "concat.txt"

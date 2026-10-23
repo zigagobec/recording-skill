@@ -9,8 +9,11 @@ pa naredi nekdo s terminalom (Žiga) z istim `plan.json`.
 **TTS: »Ni povezave do api.openai.com« / »api.elevenlabs.io«.** Ista nastavitev kot zgoraj,
 domena `api.openai.com` (ali `api.elevenlabs.io`). Druga možnost: njen glas (`voice_file`).
 
-**TTS: »Manjka OPENAI_API_KEY«.** V projektni mapi ustvari datoteko `.env` z vrstico
-`OPENAI_API_KEY=sk-...` (ključ ji da Žiga). Ključa ne kopiraj v klepet ali v plan.json.
+**TTS: »Manjka OPENAI_API_KEY«.** Datoteke `.env` ni v projektni mapi ali mapi nad njo.
+Najlažje: Žiga ji pošlje pripravljeno datoteko `.env`, ki jo shrani v mapo `Videi`. Ročno v
+Beležnici: nova datoteka, ena vrstica `OPENAI_API_KEY=sk-...`, Datoteka → Shrani kot →
+*Vrsta datoteke: Vse datoteke* → ime `.env` (sicer nastane `.env.txt`, ki se ne prebere).
+Ključa ne kopiraj v klepet ali v plan.json.
 
 **TTS napaka 401/429.** 401 = napačen ključ; 429 = ni dobroimetja ali preveč zahtev naenkrat.
 

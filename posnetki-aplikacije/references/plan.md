@@ -49,9 +49,11 @@ Poti so relativne na mapo, v kateri je `plan.json`. Časi so v sekundah (decimal
 ## Segmenti
 
 Skupno vsem: `voiceover` (besedilo za TTS) **ali** `voice_file` (njen posnetek, npr.
-`glas/03.m4a`; `voiceover` takrat služi le za podnapise), `caption` (napis spodaj levo).
+`glas/03.m4a`; `voiceover` takrat služi le za podnapise). `clip` in `image` imata še
+`caption` (napis spodaj levo); pri `title` se `caption` ne prikaže.
 
-**`title`**: `text`, `subtitle`, `duration` (najmanj; če je glas daljši, traja do konca glasu).
+**`title`**: `text`, `subtitle` (oba se samodejno prelomita; naj bosta kratka),
+`duration` (najmanj; če je glas daljši, traja do konca glasu).
 
 **`clip`**: odsek posnetka (`.mp4`, `.mov`, `.webm`, `.mkv`, tudi `.gif`).
 - `start`, `end`: odsek v izvornem posnetku. Brez `end` = do konca.

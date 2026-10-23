@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from common import FONT_BOLD, ffmpeg_bin, probe
+from common import FONT_BOLD, duration_of, ffmpeg_bin, probe
 
 THUMB_W = 480
 COLS, ROWS = 4, 3
@@ -97,8 +97,10 @@ def main():
     a = ap.parse_args()
 
     src = Path(a.src)
+    if not src.is_file():
+        raise SystemExit(f"Datoteke {src} ni.")
     info = probe(src)
-    dur = info["duration"] or 0
+    dur = duration_of(src)
     outdir = src.parent / f"{src.stem}_frames"
     outdir.mkdir(exist_ok=True)
     print(f"{src.name}: {fmt(dur)} ({dur:.2f} s), {info['width']}x{info['height']}, "
@@ -106,6 +108,9 @@ def main():
 
     if a.at:
         for t in a.at:
+            if not 0 <= t < dur:
+                print(f"{t} s je izven posnetka (traja {dur:.2f} s), preskočeno")
+                continue
             print(gridded(src, t, outdir))
         return
     end = min(a.end or dur, dur)
