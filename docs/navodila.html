@@ -1,0 +1,244 @@
+<title>Video navodila s Claudom</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column; steps as a numbered track with a recording-red spine */
+:root {
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --fg: #1B1F27;
+  --muted: #5B6474;
+  --line: #DDE1E8;
+  --rec: #D7263D;
+  --rec-soft: #FBE7EA;
+  --ok-soft: #E6F2EC;
+  --ok: #1F7A4D;
+  --key-bg: #EEF0F4;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151B; --surface: #1A1E26; --fg: #E8EBF0; --muted: #9AA3B2; --line: #2C323D;
+    --rec: #FF5A6E; --rec-soft: #3A1E24; --ok-soft: #17302A; --ok: #6BD3A0; --key-bg: #262B35;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151B; --surface: #1A1E26; --fg: #E8EBF0; --muted: #9AA3B2; --line: #2C323D;
+  --rec: #FF5A6E; --rec-soft: #3A1E24; --ok-soft: #17302A; --ok: #6BD3A0; --key-bg: #262B35;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font: 400 1.0625rem/1.65 var(--body); }
+.wrap {
+  max-width: 46rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 3rem 4rem;
+  display: grid; gap: 2.75rem;
+}
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--rec); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--rec); outline-offset: 2px; border-radius: 4px; }
+header { display: grid; gap: 1rem; }
+.rec {
+  display: inline-flex; align-items: center; gap: .5rem; width: fit-content;
+  font: 500 .75rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--rec);
+}
+.rec::before { content: ""; width: .6rem; height: .6rem; border-radius: 50%; background: var(--rec); animation: blink 1.6s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .rec::before { animation: none; } }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 38rem; }
+section { display: grid; gap: 1rem; }
+.flow { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; font-weight: 500; }
+.flow span { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .3rem .85rem; }
+.flow i { color: var(--muted); font-style: normal; }
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s; }
+ol.steps > li {
+  counter-increment: s; position: relative; padding: 0 0 1.6rem 3rem;
+  border-left: 2px solid var(--line); margin-left: .9rem;
+}
+ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+ol.steps > li::before {
+  content: counter(s); position: absolute; left: -1rem; top: -.1rem;
+  width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center;
+  background: var(--rec); color: #fff; font: 700 .95rem/1 var(--display);
+}
+ol.steps > li > div { display: grid; gap: .4rem; min-width: 0; }
+ol.steps p, ul.plain li { color: var(--fg); }
+.hint { color: var(--muted); font-size: .95rem; }
+kbd {
+  font: 500 .85em/1 var(--mono); background: var(--key-bg); border: 1px solid var(--line);
+  border-bottom-width: 2px; border-radius: 5px; padding: .15em .45em; white-space: nowrap;
+}
+code { font: 500 .88em var(--mono); background: var(--key-bg); border-radius: 4px; padding: .1em .35em; overflow-wrap: anywhere; }
+.prompts { display: grid; gap: .6rem; }
+.prompt {
+  display: flex; gap: .75rem; align-items: flex-start; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: .85rem 1rem;
+}
+.prompt p { min-width: 0; }
+.prompt button {
+  flex: none; font: 500 .8rem/1 var(--body); color: var(--muted); background: transparent;
+  border: 1px solid var(--line); border-radius: 6px; padding: .45rem .6rem; cursor: pointer;
+}
+.prompt button:hover { color: var(--fg); border-color: var(--muted); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+.opt { display: grid; gap: .35rem; align-content: start; padding-top: .8rem; border-top: 2px solid var(--fg); }
+.opt.rec-top { border-top-color: var(--rec); }
+.note { background: var(--rec-soft); border-radius: 10px; padding: 1rem 1.15rem; display: grid; gap: .4rem; }
+.note.ok { background: var(--ok-soft); }
+.note strong { font-family: var(--display); font-weight: 700; }
+ul.plain { margin: 0; padding-left: 1.2rem; display: grid; gap: .45rem; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+th, td { text-align: left; padding: .7rem .9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font: 600 .75rem/1.2 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); padding-top: 1.25rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="rec">Snema</div>
+    <h1>Video navodila za našo aplikacijo, s Claudom</h1>
+    <p class="lede">Tjaša, tole je skill, ki Claudu pokaže, kako posname postopek v aplikaciji, ga zmontira v kratek video in po želji doda slovenski glas in podnapise. Ti poveš, kaj naj video pokaže, Claude naredi ostalo.</p>
+    <div class="flow" aria-label="Potek">
+      <span>scenarij</span><i>›</i><span>snemanje</span><i>›</i><span>montaža</span><i>›</i><span>glas in podnapisi</span><i>›</i><span>MP4</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Kaj potrebuješ</h2>
+    <ul class="plain">
+      <li><strong>Claude aplikacijo za računalnik</strong> (Windows ali Mac) s plačljivim paketom, ker montaža teče v načinu <strong>Cowork</strong>. V spletnem klepetu na claude.ai ne gre.</li>
+      <li><strong>Razširitev Claude in Chrome</strong> v brskalniku Chrome. Ni nujna, je pa priročna: z njo Claude sam klika po aplikaciji, medtem ko ti snemaš.</li>
+      <li><strong>Datoteko skilla</strong> <code>posnetki-aplikacije.zip</code> (link spodaj).</li>
+      <li>Za umetni glas še <strong>ključ OpenAI</strong>, ki ti ga pošljem posebej. Brez njega lahko besedilo prebereš sama ali video narediš brez glasu.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Namestitev (enkrat, 5 minut)</h2>
+    <ol class="steps">
+      <li><div>
+        <h3>Prenesi skill</h3>
+        <p>Odpri <a href="https://github.com/zigagobec/recording-skill/blob/main/dist/posnetki-aplikacije.zip">posnetki-aplikacije.zip na GitHubu</a> in klikni ikono za prenos (<em>Download raw file</em>, desno zgoraj). Datoteke ne razpakiraj.</p>
+      </div></li>
+      <li><div>
+        <h3>Naloži ga v Claude</h3>
+        <p>V Claude aplikaciji odpri <strong>Nastavitve</strong> → <strong>Capabilities</strong> (Zmožnosti) → razdelek <strong>Skills</strong> → <strong>Upload skill</strong> in izberi zip. V novejših verzijah je to pod <strong>Customize → Skills</strong>.</p>
+        <p class="hint">Na isti strani mora biti vklopljeno <em>Code execution and file creation</em>. Po nalaganju skill <code>posnetki-aplikacije</code> pusti vklopljen.</p>
+      </div></li>
+      <li><div>
+        <h3>Ustvari mapo za videe</h3>
+        <p>Na primer <code>Dokumenti\Videi</code>. Za vsak video bo Claude naredil svojo podmapo s posnetki, glasom in končnim videom.</p>
+      </div></li>
+      <li><div>
+        <h3>Dodaj ključ za glas</h3>
+        <p>V mapo <code>Videi</code> shrani datoteko z imenom <code>.env</code> (s piko spredaj, brez končnice) in vanjo eno vrstico: <code>OPENAI_API_KEY=</code> in za enačajem ključ, ki ti ga pošljem. Ključa ne prilepi v klepet. Če ti ustvarjanje datoteke dela težave, prosi Clauda, naj ti jo naredi.</p>
+      </div></li>
+      <li><div>
+        <h3>Dovoli dostop do interneta (če Claude javi napako)</h3>
+        <p>Cowork ima dostop do interneta omejen. Če Claude napiše, da ne more namestiti orodij ali doseči <code>api.openai.com</code>, v nastavitvah pri izvajanju kode dovoli domene <code>pypi.org</code>, <code>files.pythonhosted.org</code> in <code>api.openai.com</code>. Claude ti bo povedal, katera manjka.</p>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Kako ga uporabljaš</h2>
+    <p>V Claude aplikaciji preklopi na <strong>Cowork</strong>, izberi mapo <code>Videi</code> in napiši, kaj želiš. Skill se vklopi sam, ko omeniš video, posnetek ali navodila. Nekaj primerov:</p>
+    <div class="prompts">
+      <div class="prompt"><p>Naredi 2-minutni video navodila, kako v Pro.4 vnesemo prejeti račun. Za sodelavce, z umetnim glasom in podnapisi.</p><button type="button" data-copy>Kopiraj</button></div>
+      <div class="prompt"><p>Posnela sem postopek odpiranja novega partnerja, posnetek je v Videi\partner\posnetki. Zmontiraj ga, izreži čakanje in dodaj napise s koraki.</p><button type="button" data-copy>Kopiraj</button></div>
+      <div class="prompt"><p>Rabim kratek GIF brez glasu, ki pokaže, kje se izvozi poročilo v Excel. Klikaj ti, jaz bom snemala.</p><button type="button" data-copy>Kopiraj</button></div>
+      <div class="prompt"><p>V videu o plačah v koraku 3 zamenjaj stavek z »Nato potrdimo obračun« in zamegli ime zaposlenega v tabeli.</p><button type="button" data-copy>Kopiraj</button></div>
+    </div>
+    <p>Claude bo najprej predlagal <strong>scenarij</strong> (tabela korakov z besedilom za glas). Preberi ga in popravi, kar ni prav: popravek scenarija je hiter, ponovno snemanje ni.</p>
+  </section>
+
+  <section>
+    <h2>Snemanje</h2>
+    <p>Zaslon vedno posname snemalnik tvojega računalnika. Claude ti pove, kdaj začeti in kdaj ustaviti.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Kaj</th><th>Windows</th><th>Mac</th></tr></thead>
+        <tbody>
+          <tr><td>Začni snemanje dela zaslona</td><td><kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>, izberi okno brskalnika, <em>Začni</em></td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>5</kbd>, <em>Posnemi izbrani del</em></td></tr>
+          <tr><td>Ustavi</td><td>rdeči gumb v orodni vrstici, nato <em>Shrani kot</em></td><td>gumb v menijski vrstici zgoraj</td></tr>
+          <tr><td>Posnetek zaslona (slika)</td><td><kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>4</kbd></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cols">
+      <div class="opt rec-top">
+        <h3>Claude klika, ti snemaš</h3>
+        <p class="hint">Če imaš Claude in Chrome. Zaženeš snemanje, napišeš »začni« in miško pustiš pri miru. Premore med koraki Claude pri montaži izreže.</p>
+      </div>
+      <div class="opt">
+        <h3>Ti klikaš po seznamu</h3>
+        <p class="hint">Claude ti da oštevilčene korake. Delaj malo počasneje kot sicer. Ob napaki ne ustavljaj, samo ponovi korak.</p>
+      </div>
+      <div class="opt">
+        <h3>Kratek GIF</h3>
+        <p class="hint">Za 5–20 sekund brez glasu, npr. v e-pošto ali Confluence. Claude ga posname sam prek Claude in Chrome.</p>
+      </div>
+    </div>
+    <p class="hint">Pred snemanjem: zapri druge zavihke, vklopi »Ne moti« (<kbd>Win</kbd> + <kbd>N</kbd>), brskalnik razširi čez cel zaslon. Posnetek shrani v mapo <code>posnetki</code>, ki jo naredi Claude.</p>
+  </section>
+
+  <div class="note">
+    <strong>Osebni podatki</strong>
+    <p>Snemaj v <strong>testnem okolju</strong> (zgoraj piše TESTNO OKOLJE) ali v demo podjetju z izmišljenimi podatki. Prava imena strank, davčne številke, IBAN-i, plače in zdravstveni podatki ne smejo biti v videu. Če se kaj vseeno vidi, Claudu reci, naj tisti del zamegli, in končni video še sama preglej.</p>
+  </div>
+
+  <section>
+    <h2>Glas</h2>
+    <div class="cols">
+      <div class="opt rec-top"><h3>Umetni glas</h3><p class="hint">Slovenski glas OpenAI, privzeto ženski »nova«. Če ti ne ustreza, prosi Clauda za preizkus drugih glasov. Kratice in števila Claude zapiše tako, da jih glas pravilno izgovori.</p></div>
+      <div class="opt"><h3>Tvoj glas</h3><p class="hint">Claude ti da oštevilčene stavke. Vsakega posnameš z Diktafonom (Windows) ali Glasovnimi beležkami (Mac) in shraniš kot <code>01</code>, <code>02</code> … v mapo <code>glas</code>.</p></div>
+      <div class="opt"><h3>Brez glasu</h3><p class="hint">Razlago nosijo napisi na zaslonu. Primerno za kratke videe in GIF-e.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Kaj dobiš</h2>
+    <ul class="plain">
+      <li><code>izvoz/ime-videa.mp4</code>: končni video v 1920×1080, z naslovno kartico, napisi, približanji in glasom.</li>
+      <li><code>izvoz/ime-videa.srt</code>: podnapisi za YouTube, Teams ali e-učilnico.</li>
+      <li><code>plan.json</code>: načrt montaže. Pusti ga v mapi: za popravek Claudu samo poveš, kaj spremeniti, in on video znova sestavi v minuti ali dveh.</li>
+    </ul>
+  </section>
+
+  <div class="note ok">
+    <strong>Če se kaj zatakne</strong>
+    <p>Claudu napiši, kaj vidiš, in prilepi napako. Večino težav (manjkajoči ključ, dostop do interneta, posnetek na omrežnem disku) zna razložiti sam. Če ne gre, mi pošlji mapo projekta in sestavim video pri sebi iz istega načrta.</p>
+  </div>
+
+  <footer>
+    Skill in navodila: <a href="https://github.com/zigagobec/recording-skill">github.com/zigagobec/recording-skill</a> · pripravil Žiga
+  </footer>
+</div>
+
+<script>
+document.querySelectorAll("[data-copy]").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var text = btn.parentElement.querySelector("p").textContent;
+    var done = function () { btn.textContent = "Kopirano"; setTimeout(function () { btn.textContent = "Kopiraj"; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { selectText(btn); });
+    } else { selectText(btn); }
+  });
+});
+function selectText(btn) {
+  var p = btn.parentElement.querySelector("p");
+  var r = document.createRange(); r.selectNodeContents(p);
+  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+</script>

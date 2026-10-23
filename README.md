@@ -7,6 +7,8 @@ podnapise `.srt`.
 Namenjen je **Claude aplikaciji v načinu Cowork** (Windows x64 / Mac Apple Silicon, plačljiv
 paket). Deluje tudi v Claude Code.
 
+**Navodila za uporabnike:** https://claude.ai/artifact/W9kttQDzsnyYFBKwCn2wsZ (vir: `docs/navodila.html`)
+
 ## Namestitev
 
 1. Prenesi [`dist/posnetki-aplikacije.zip`](dist/posnetki-aplikacije.zip) (gumb *Download raw file*).
